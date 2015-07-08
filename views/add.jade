@@ -1,7 +1,12 @@
 extends layout
 
 block content
-	h1= success
+	if success === true
+		script.
+			Materialize.toast('Added device to database', 4000);
+	else if success === false
+		script.
+			Materialize.toast('Failed to add device to database', 4000);
 	div(class='row')
 		form(action='/newDevice', method='post', enctype='multipart/form-data' class='col s12')
 			div(class='row')

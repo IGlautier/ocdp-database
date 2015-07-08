@@ -24,10 +24,13 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/newDevice', function(req, res, next) {
-	if(req.query.success) var added = true;
+	
+	if(typeof req.query.success != 'undefined') {
+		var added;
+		if(req.query.success == true) added = true;
 
-	if(req.query.failure) var added = false;
-
+		else added = false;
+	}
 	console.log(req.query);
 	res.render('add', { title: 'OCDP Device Database', success: added});
 
@@ -40,7 +43,7 @@ router.post('/newDevice', function(req, res, next) {
 		name: req.body.deviceName, type: req.body.type, manufacturer : req.body.manufacturer, website: req.body.website, git: req.body.git, description: req.body.description, dateAdded: timestamp
 	}, function (err, dbRes) {
 		console.log(dbRes);
-		if(err) res.redirect('/newDevice?failure=true');
+		if(err) res.redirect('/newDevice?success=false');
 		else res.redirect('/newDevice?success=true');
 	});
 	
