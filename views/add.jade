@@ -1,0 +1,33 @@
+extends layout
+
+block content
+	div(class='row')
+		form(action='#', method='post', enctype='multipart/form-data' class='col s12')
+			div(class='row')
+				div(class='input-field col s6')
+					input(class='validate' type='text', name='deviceName')
+					label(for='deviceName') Device Name
+				div(class='input-field file-field col s6')
+					input(class='file-path validate', type='text', name='img')
+					label(for='img') Device Image
+					div(class='btn')
+						span File
+						input(type='file')
+			div(class='row')
+				div(class='input-field col s12')
+					textarea(class='materialize-textarea', id='description')
+					label(for='description') Description
+			div(class='row')
+				div(class='input-field col s6')
+					input(class='validate' type='text', name='manufacturer')
+					label(for='manufacturer') Manufacturer
+				div(class='input-field col s6')
+					input(class='validate' type='url', name='website')
+					label(for='website') Manufacturer's Website
+			div(class='row')
+				div(class='input-field col s6')
+					input(class='validate' type='url', name='git')
+					label(for='git') Git Repository
+				div(class='input-field col s6')
+					input(class='validate' type='text', name='type')
+					label(for='type') Device Type
