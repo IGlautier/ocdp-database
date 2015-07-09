@@ -23,7 +23,7 @@ router.get('/', function(req, res, next) {
 	devices.view('devicelist/all', function (err, data) {
 		var nDev = [];
 		for(var i = data.length-1; i > data.length-4; i--) nDev.push(data[i]);
-		console.log(util.inspect(nDev));
+		
 		res.render('index', { title: 'OCDP Device Database', newDevices: nDev });
 	});
 	
@@ -36,9 +36,9 @@ router.get('/newDevice', function(req, res, next) {
 		if(req.query.success == 'true') added = true;
 
 		else added = false;
-		console.log(added);
+		
 	}
-	console.log(req.query);
+	
 	res.render('add', { title: 'OCDP Device Database', success: added});
 
 });
@@ -49,7 +49,7 @@ router.post('/newDevice', function(req, res, next) {
 	devices.save({
 		name: req.body.deviceName, type: req.body.type, manufacturer : req.body.manufacturer, website: req.body.website, git: req.body.git, description: req.body.description, dateAdded: timestamp
 	}, function (err, dbRes) {
-		console.log(dbRes);
+		
 		if(err) res.redirect('/newDevice?success=false');
 		else res.redirect('/newDevice?success=true');
 	});
@@ -87,6 +87,20 @@ router.get('/markdown', function(req, res, next) {
 		});
 	}
 	else res.sendStatus(404);
+	
+});
+
+router.get('/list', function(req, res, next) {
+	var page = 0;
+	if(typeof req.query.page != 'undefined') page = req.query.page;
+	
+	devices.view('devicelist/all', function (err, data) {
+		var nDev = [];
+		for(var i = page; i < page+10; i++) nDev.push(data[i]);
+		var total = Math.ceil(data.length/10);
+		console.log(nDev);
+		res.render('list', { title: 'OCDP Device List', devices: nDev, num: total, cur: page});
+	});
 	
 });
 
