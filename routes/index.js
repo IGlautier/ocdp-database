@@ -2,7 +2,13 @@ var express = require('express');
 var router = express.Router();
 var cradle = require('cradle');
 var util = require('util');
+var marked = require('marked');
+var request = require('request');
 
+function notFound(res) {
+	res.status(404);
+	res.render('404', {title: '404- not found'});
+}
 
 var con = new(cradle.Connection)('http://localhost', 5984, {
       cache: true,
@@ -27,9 +33,10 @@ router.get('/newDevice', function(req, res, next) {
 	
 	if(typeof req.query.success != 'undefined') {
 		var added;
-		if(req.query.success == true) added = true;
+		if(req.query.success == 'true') added = true;
 
 		else added = false;
+		console.log(added);
 	}
 	console.log(req.query);
 	res.render('add', { title: 'OCDP Device Database', success: added});
@@ -48,5 +55,44 @@ router.post('/newDevice', function(req, res, next) {
 	});
 	
 });
+
+router.get('/device', function(req, res, next) {
+
+	if(typeof req.query.name != 'undefined') {
+		devices.view('devicelist/single', {key: req.query.name}, function (err, data) {
+			if(err) notFound(res);
+			else res.render('single', {title: data[0].value.name, device: data[0].value});
+		});
+	}
+	else notFound(res);
+	
+	
+});
+
+router.get('/markdown', function(req, res, next) {
+	
+	if(typeof req.query.name != 'undefined') {
+		devices.view('devicelist/git', {key: req.query.name}, function (err, data) {
+			if(err) res.sendStatus(404);
+			else if(typeof data[0] != 'undefined') {
+				request(data[0].value.url, function(err, response, body) {
+					if(err) res.sendStatus(404);
+					else marked(body, function(err, content) {
+						if(err) res.sendStatus(404);
+						else res.send(content);
+					});
+				});
+			}
+			else res.sendStatus(404);
+		});
+	}
+	else res.sendStatus(404);
+	
+});
+
+router.get('*', function(req, res){
+	notFound(res);
+});
+
 
 module.exports = router;

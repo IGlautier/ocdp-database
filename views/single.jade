@@ -1,0 +1,30 @@
+extends layout
+
+block content
+	div(class='row')
+		div(class='col s12')
+			h2= device.name
+	div(class='row')
+		div(class='col s8')
+			p= 'Manufacturer: ' + device.manufacturer
+			p Manufacturer's website:  
+				a(href=device.website)= device.website
+			p= 'Device Type: ' + device.type
+		div(class='col s4 m4')
+			div(class='card')
+				div(class='card-image')
+					img(src=device.image)
+				div(class='card-content')
+					p= device.description
+	div(class='row')
+		div(class='col s12')
+			#readme
+				div(class='progress')
+					div(class='indeterminate')
+
+	script.
+		$(document).ready(function(){
+			$.get("markdown", {name: "#{device.name}"}, function(data) {
+				$("#readme").html(data);
+			});
+		});
