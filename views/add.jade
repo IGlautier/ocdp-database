@@ -13,12 +13,12 @@ block content
 				div(class='input-field col s6')
 					input(class='validate' type='text', name='deviceName')
 					label(for='deviceName') Device Name
-				div(class='input-field file-field col s6')
-					input(class='file-path validate', type='text', name='img')
-					label(for='img') Device Image
+				div(class='file-field input-field col s6')
 					div(class='btn')
-						span File
-						input(type='file')
+						span File Upload
+						input(type='file' name='img')
+					div(class='file-path-wrapper')
+						input(class='file-path' name='path' type='text')
 			div(class='row')
 				div(class='input-field col s12')
 					textarea(class='materialize-textarea', name='description')

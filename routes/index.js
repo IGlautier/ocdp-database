@@ -52,9 +52,10 @@ router.get('/newDevice', function(req, res, next) {
 
 router.post('/newDevice', function(req, res, next) {
 	
+	var filePath = req.files.img.path.slice(6);
 	var timestamp = (new Date).getTime();
 	devices.save({
-		name: req.body.deviceName, type: req.body.type, manufacturer : req.body.manufacturer, website: req.body.website, git: req.body.git, description: req.body.description, dateAdded: timestamp
+		name: req.body.deviceName, type: req.body.type, manufacturer : req.body.manufacturer, website: req.body.website, git: req.body.git, description: req.body.description, dateAdded: timestamp, image: filePath
 	}, function (err, dbRes) {
 		
 		if(err) res.redirect('/newDevice?success=false');
@@ -106,12 +107,12 @@ router.get('/list', function(req, res, next) {
 	devices.view('devicelist/all', function (err, data) {
 		var nDev = [];
 		console.log(page+1);
-		for(var i = page; i < page+1; i++) {
+		for(var i = page; i < page+5; i++) {
 		
 			nDev.push(data[i]);
 
 		}
-		var total = Math.ceil(data.length/1);
+		var total = Math.ceil(data.length/5);
 		console.log(nDev);
 		res.render('list', { title: 'OCDP Device List', devices: nDev, num: total, cur: page});
 	});

@@ -16,6 +16,7 @@ block content
 							span(class='card-title grey-text text-darken-4')= device.value.name
 								i(class='material-icons right') close
 							p= device.value.description
+							a(href='/device?name=#{device.value.name}') Device Integration Instructions
 	- var n = 0
 		ul(class='pagination')
 			while n < num
