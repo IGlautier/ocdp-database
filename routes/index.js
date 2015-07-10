@@ -11,20 +11,27 @@ function notFound(res) {
 }
 
 var con = new(cradle.Connection)('http://localhost', 5984, {
-      cache: true,
-      raw: false,
-      forceSave: true
+	auth: { username: 'node', password: 'dbp4sS123' },
+	cache: true,
+	raw: false,
+	forceSave: true
   });
 
+
+
 var devices = con.database('device');
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
 	devices.view('devicelist/all', function (err, data) {
 		var nDev = [];
-		for(var i = data.length-1; i > data.length-4; i--) nDev.push(data[i]);
+		if(err) res.render('index', { title: 'OCDP Device Database'});
+		else {
+			if(typeof data != 'undefined') for(var i = data.length-1; i > data.length-4; i--) nDev.push(data[i]);
 		
-		res.render('index', { title: 'OCDP Device Database', newDevices: nDev });
+			res.render('index', { title: 'OCDP Device Database', newDevices: nDev });
+		}
 	});
 	
 });
@@ -51,7 +58,9 @@ router.post('/newDevice', function(req, res, next) {
 	}, function (err, dbRes) {
 		
 		if(err) res.redirect('/newDevice?success=false');
+
 		else res.redirect('/newDevice?success=true');
+
 	});
 	
 });
@@ -92,12 +101,17 @@ router.get('/markdown', function(req, res, next) {
 
 router.get('/list', function(req, res, next) {
 	var page = 0;
-	if(typeof req.query.page != 'undefined') page = req.query.page;
-	
+	if(typeof req.query.page != 'undefined') page = parseFloat(req.query.page);
+	console.log("page: "+page);
 	devices.view('devicelist/all', function (err, data) {
 		var nDev = [];
-		for(var i = page; i < page+10; i++) nDev.push(data[i]);
-		var total = Math.ceil(data.length/10);
+		console.log(page+1);
+		for(var i = page; i < page+1; i++) {
+		
+			nDev.push(data[i]);
+
+		}
+		var total = Math.ceil(data.length/1);
 		console.log(nDev);
 		res.render('list', { title: 'OCDP Device List', devices: nDev, num: total, cur: page});
 	});
