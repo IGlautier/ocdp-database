@@ -4,39 +4,68 @@ var cradle = require('cradle');
 var util = require('util');
 var marked = require('marked');
 var request = require('request');
+var config = require('./config.json');
 
 function notFound(res) {
 	res.status(404);
 	res.render('404', {title: '404- not found'});
 }
 
-var con = new(cradle.Connection)('http://localhost', 5984, {
-	auth: { username: 'node', password: 'dbp4sS123' },
-	cache: true,
-	raw: false,
-	forceSave: true
-  });
-
-
-
-var devices = con.database('device');
-
-
 /* GET home page. */
-router.get('/', function(req, res, next) {
-	devices.view('devicelist/all', function (err, data) {
-		var nDev = [];
-		if(err) res.render('index', { title: 'OCDP Device Database'});
+router.get('/', function(req, res, next) {	
+	request(config.restApi + 'device/last/3', function (error, response, body) {
+		var data = JSON.parse(body);
+		if(error) notFound(res);
+		res.render('index', { title: 'OCDP Device Database', newDevices: data.devices });
+	});
+});
+
+/* Get single device */
+router.get('/device', function(req, res, next) {
+
+	request(config.restApi + 'device/name/' + req.query.name, function (error, response, body) {
+		var data = JSON.parse(body);
+	
+		if(error) notFound(res);
+		res.render('single', { title: 'OCDP Device Database', device: data });
+	});
+});
+
+router.get('/markdown', function(req, res, next) {
+
+	request(req.query.git, function(err, response, body) {
+		if(err) res.sendStatus(404);
+		else marked(body, function(err, content) {
+			if(err) res.sendStatus(404);
+			else res.send(content);
+		});
+	});
+	
+});
+
+router.get('/list', function(req, res, next) {
+	var page = 0;
+	if(typeof req.query.page != 'undefined') page = parseFloat(req.query.page);
+	request(config.restApi + 'device/all', function(error, response, body) {
+		if(error) res.render('error', {message: '500 - Something went wrong'});
 		else {
-			if(typeof data != 'undefined') for(var i = data.length-1; i > data.length-4; i--) nDev.push(data[i]);
-		
-			res.render('index', { title: 'OCDP Device Database', newDevices: nDev });
+			var nDev = [];
+			var data = JSON.parse(body);
+			var i = page*3;
+			while(i < (page*3)+3 && i < data.devices.length){
+				nDev.push(data.devices[i]);
+				i++;
+			}
+			var total = Math.ceil(data.number/3);
+			
+			res.render('list', { title: 'OCDP Device List', devices: nDev, num: total, cur: page});
 		}
 	});
 	
 });
 
-router.get('/newDevice', function(req, res, next) {
+/* Adding a device */
+/*router.get('/newDevice', function(req, res, next) {
 	
 	if(typeof req.query.success != 'undefined') {
 		var added;
@@ -48,9 +77,10 @@ router.get('/newDevice', function(req, res, next) {
 	
 	res.render('add', { title: 'OCDP Device Database', success: added});
 
-});
+});*/
 
-router.post('/newDevice', function(req, res, next) {
+/* Put new device */
+/*router.post('/newDevice', function(req, res, next) {
 	
 	var filePath = req.files.img.path.slice(6);
 	var timestamp = (new Date).getTime();
@@ -66,6 +96,7 @@ router.post('/newDevice', function(req, res, next) {
 	
 });
 
+/* Request individual device *//*
 router.get('/device', function(req, res, next) {
 
 	if(typeof req.query.name != 'undefined') {
@@ -119,6 +150,7 @@ router.get('/list', function(req, res, next) {
 	
 });
 
+*/
 router.get('*', function(req, res){
 	notFound(res);
 });

@@ -24,7 +24,7 @@ block content
 
 	script.
 		$(document).ready(function(){
-			$.get("markdown", {name: "#{device.name}"}, function(data) {
+			$.get("markdown", {git: "#{device.git}"}, function(data) {
 				$("#readme").html(data);
 			});
 		});
