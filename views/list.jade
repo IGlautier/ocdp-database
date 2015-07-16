@@ -3,6 +3,18 @@ extends layout
 block content
 	div(class='row')
 		div(class='col s12')
+			h4 Filter by Device Type
+			div(class='col s4')
+				div(class='collection')
+					a(href='/list/type?type=GPS' class='collection-item') GPS
+			div(class='col s4')
+				div(class='collection')
+					a(href='/list/type?type=CO2 Sensor' class='collection-item') CO2 Sensor
+			div(class='col s4')
+				div(class='collection')
+					a(href='/list/type?type=Temperature Sensor' class='collection-item') Temperature Sensor
+	div(class='row')
+		div(class='col s12')
 			each device in devices	
 				div(class='col s4')
 					div(class='card')

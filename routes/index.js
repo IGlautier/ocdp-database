@@ -24,10 +24,31 @@ router.get('/', function(req, res, next) {
 router.get('/device', function(req, res, next) {
 
 	request(config.restApi + 'device/name/' + req.query.name, function (error, response, body) {
-		var data = JSON.parse(body);
+		
 	
 		if(error) notFound(res);
+		var data = JSON.parse(body);
 		res.render('single', { title: 'OCDP Device Database', device: data });
+	});
+});
+
+router.get('/list/type', function(req, res, next) {
+	var page = 0;
+	request(config.restApi + 'device/type/' + req.query.type, function (error, response, body) {
+	
+		if(error) res.render('error', {message: '500 - Something went wrong'});
+		else {
+			var nDev = [];
+			var data = JSON.parse(body);
+			var i = page*3;
+			while(i < (page*3)+3 && i < data.devices.length){
+				nDev.push(data.devices[i]);
+				i++;
+			}
+			var total = Math.ceil(data.number/3);
+			
+			res.render('list', { title: 'OCDP Device List', devices: nDev, num: total, cur: page});
+		}
 	});
 });
 
@@ -92,60 +113,6 @@ router.get('/list', function(req, res, next) {
 
 		else res.redirect('/newDevice?success=true');
 
-	});
-	
-});
-
-/* Request individual device *//*
-router.get('/device', function(req, res, next) {
-
-	if(typeof req.query.name != 'undefined') {
-		devices.view('devicelist/single', {key: req.query.name}, function (err, data) {
-			if(err) notFound(res);
-			else res.render('single', {title: data[0].value.name, device: data[0].value});
-		});
-	}
-	else notFound(res);
-	
-	
-});
-
-router.get('/markdown', function(req, res, next) {
-	
-	if(typeof req.query.name != 'undefined') {
-		devices.view('devicelist/git', {key: req.query.name}, function (err, data) {
-			if(err) res.sendStatus(404);
-			else if(typeof data[0] != 'undefined') {
-				request(data[0].value.url, function(err, response, body) {
-					if(err) res.sendStatus(404);
-					else marked(body, function(err, content) {
-						if(err) res.sendStatus(404);
-						else res.send(content);
-					});
-				});
-			}
-			else res.sendStatus(404);
-		});
-	}
-	else res.sendStatus(404);
-	
-});
-
-router.get('/list', function(req, res, next) {
-	var page = 0;
-	if(typeof req.query.page != 'undefined') page = parseFloat(req.query.page);
-	console.log("page: "+page);
-	devices.view('devicelist/all', function (err, data) {
-		var nDev = [];
-		console.log(page+1);
-		for(var i = page; i < page+5; i++) {
-		
-			nDev.push(data[i]);
-
-		}
-		var total = Math.ceil(data.length/5);
-		console.log(nDev);
-		res.render('list', { title: 'OCDP Device List', devices: nDev, num: total, cur: page});
 	});
 	
 });
